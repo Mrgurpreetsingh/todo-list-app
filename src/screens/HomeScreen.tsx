@@ -1,25 +1,26 @@
+// src/screens/HomeScreen.tsx
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 
-const App = () => {
+const HomeScreen = () => {
   return (
     <View style={styles.container}>
-      <Text style={styles.text}>Bienvenue dans ma To-Do List !</Text>
+      <Text style={styles.title}>Bienvenue dans la Todo List !</Text>
     </View>
   );
 };
 
+export default HomeScreen;
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f0f0f0',
     justifyContent: 'center',
     alignItems: 'center',
+    backgroundColor: '#fff',
   },
-  text: {
-    fontSize: 22,
-    color: '#333',
+  title: {
+    fontSize: 20,
+    fontWeight: 'bold',
   },
 });
-
-export default App;
