@@ -11,11 +11,15 @@ const HomeScreen = () => {
     setTasks(prev => [...prev, task]);
   };
 
+  const deleteTask = (indexToRemove: number) => {
+    setTasks(prev => prev.filter((_, index) => index !== indexToRemove));
+  };
+
   return (
     <View style={styles.container}>
       <Header />
       <InputTask onAddTask={addTask} />
-      <TaskList tasks={tasks} />
+      <TaskList tasks={tasks} onDeleteTask={deleteTask} />
     </View>
   );
 };
