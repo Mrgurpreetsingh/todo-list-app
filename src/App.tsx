@@ -1,25 +1,13 @@
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { NavigationContainer } from '@react-navigation/native';
+import HomeScreen from './screens/HomeScreen';
 
 const App = () => {
   return (
-    <View style={styles.container}>
-      <Text style={styles.text}>Bienvenue dans ma To-Do List !</Text>
-    </View>
+    <NavigationContainer>
+      <HomeScreen />
+    </NavigationContainer>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#f0f0f0',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  text: {
-    fontSize: 22,
-    color: '#333',
-  },
-});
 
 export default App;

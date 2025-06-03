@@ -1,26 +1,45 @@
-// src/screens/HomeScreen.tsx
-import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import React, { useState } from 'react';
+import { View, StyleSheet, FlatList, Text } from 'react-native';
+import Header from '../components/Header';
+import InputTask from '../components/InputTask';
 
 const HomeScreen = () => {
+  const [tasks, setTasks] = useState<string[]>([]);
+
+  const addTask = (task: string) => {
+    setTasks(prev => [...prev, task]);
+  };
+
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Bienvenue dans la Todo List !</Text>
+      <Header />
+      <InputTask onAddTask={addTask} />
+
+      <FlatList
+        data={tasks}
+        keyExtractor={(item, index) => index.toString()}
+        renderItem={({ item }) => (
+          <View style={styles.taskItem}>
+            <Text>{item}</Text>
+          </View>
+        )}
+      />
     </View>
   );
 };
 
-export default HomeScreen;
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#fff',
+    backgroundColor: '#f5f5f5',
   },
-  title: {
-    fontSize: 20,
-    fontWeight: 'bold',
+  taskItem: {
+    backgroundColor: 'white',
+    padding: 15,
+    marginHorizontal: 20,
+    marginVertical: 5,
+    borderRadius: 8,
   },
 });
+
+export default HomeScreen;
