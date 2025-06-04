@@ -4,7 +4,7 @@ import Header from '../components/Header';
 import InputTask from '../components/InputTask';
 import TaskList from '../components/TaskList';
 
-const HomeScreen = () => {
+const TachesScreen = () => {
   const [tasks, setTasks] = useState<string[]>([]);
 
   const addTask = (task: string) => {
@@ -31,4 +31,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default HomeScreen;
+export default TachesScreen;
