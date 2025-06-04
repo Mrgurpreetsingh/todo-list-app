@@ -1,11 +1,11 @@
 import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
-import HomeScreen from './screens/HomeScreen';
+import TabNavigator from './navigation/TabNavigator';
 
 const App = () => {
   return (
     <NavigationContainer>
-      <HomeScreen />
+      <TabNavigator />
     </NavigationContainer>
   );
 };
