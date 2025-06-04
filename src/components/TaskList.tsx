@@ -1,47 +1,36 @@
 // src/components/TaskList.tsx
 import React from 'react';
-import {
-  FlatList,
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity, // ✅ Import ajouté
-} from 'react-native';
-import Icon from 'react-native-vector-icons/MaterialIcons'; // ✅ Import ajouté
+import { FlatList } from 'react-native';
+import TaskItem from './TaskItem';
 
-type Props = {
-  tasks: string[];
-  onDeleteTask: (index: number) => void;
+type Tache = {
+  id: string;
+  titre: string;
+  complete: boolean;
 };
 
-const TaskList: React.FC<Props> = ({ tasks, onDeleteTask }) => {
+type Props = {
+  tasks: Tache[];
+  onDeleteTask: (id: string) => void;
+  onToggleComplete: (id: string) => void;
+};
+
+const TaskList: React.FC<Props> = ({ tasks, onDeleteTask, onToggleComplete }) => {
   return (
     <FlatList
       data={tasks}
-      keyExtractor={(item, index) => index.toString()}
-      renderItem={({ item, index }) => (
-        <View style={styles.taskItem}>
-          <Text>{item}</Text>
-          <TouchableOpacity onPress={() => onDeleteTask(index)}>
-            <Icon name="delete" size={20} color="red" />
-          </TouchableOpacity>
-        </View>
+      keyExtractor={(item) => item.id}
+      renderItem={({ item }) => (
+        <TaskItem
+          id={item.id}
+          text={item.titre}
+          completed={item.complete}
+          toggleComplete={onToggleComplete}
+          deleteTask={onDeleteTask}
+        />
       )}
     />
   );
 };
-
-const styles = StyleSheet.create({
-  taskItem: {
-    backgroundColor: 'white',
-    padding: 15,
-    marginHorizontal: 20,
-    marginVertical: 5,
-    borderRadius: 8,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-});
 
 export default TaskList;

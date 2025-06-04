@@ -3,23 +3,47 @@ import { View, StyleSheet } from 'react-native';
 import Header from '../components/Header';
 import InputTask from '../components/InputTask';
 import TaskList from '../components/TaskList';
+import { v4 as uuidv4 } from 'uuid';
+
+type Tache = {
+  id: string;
+  titre: string;
+  complete: boolean;
+};
 
 const TachesScreen = () => {
-  const [tasks, setTasks] = useState<string[]>([]);
+  const [tasks, setTasks] = useState<Tache[]>([]);
 
-  const addTask = (task: string) => {
-    setTasks(prev => [...prev, task]);
+  const addTask = (titre: string) => {
+    const nouvelleTache: Tache = {
+      id: uuidv4(),
+      titre,
+      complete: false,
+    };
+    setTasks(prev => [...prev, nouvelleTache]);
   };
 
-  const deleteTask = (indexToRemove: number) => {
-    setTasks(prev => prev.filter((_, index) => index !== indexToRemove));
+  const deleteTask = (idToRemove: string) => {
+    setTasks(prev => prev.filter(task => task.id !== idToRemove));
+  };
+
+  const toggleComplete = (id: string) => {
+    setTasks(prev =>
+      prev.map(task =>
+        task.id === id ? { ...task, complete: !task.complete } : task
+      )
+    );
   };
 
   return (
     <View style={styles.container}>
       <Header />
       <InputTask onAddTask={addTask} />
-      <TaskList tasks={tasks} onDeleteTask={deleteTask} />
+      <TaskList
+        tasks={tasks}
+        onDeleteTask={deleteTask}
+        onToggleComplete={toggleComplete}
+      />
     </View>
   );
 };
