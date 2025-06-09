@@ -10,7 +10,7 @@ const LoginScreen = ({ navigation }: any) => {
 
   const handleLogin = () => {
     if (username === 'admin' && password === '1234') {
-      login(username);
+      login(username,password);
       navigation.replace('MainApp');
     } else {
       Alert.alert('Erreur', 'Identifiants incorrects'); // 👍 Pas de `alert()` JS ici
