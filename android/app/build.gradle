@@ -116,6 +116,20 @@ dependencies {
     } else {
         implementation jscFlavor
     }
+      // Firebase BoM (Bill of Materials) : gère les versions compatibles des SDK Firebase
+    implementation platform('com.google.firebase:firebase-bom:33.15.0')
+
+    // Exemple : Firebase Analytics (remplace ou ajoute selon ce que tu veux)
+    implementation 'com.google.firebase:firebase-analytics'
+
+    // Si tu utilises l'authentification Firebase, ajoute par exemple :
+    // implementation 'com.google.firebase:firebase-auth'
+
+    // D'autres SDK Firebase peuvent être ajoutés ici de la même façon
+     // Add the dependencies for any other desired Firebase products
+  // https://firebase.google.com/docs/android/setup#available-libraries
 }
 
 apply from: "../../node_modules/react-native-vector-icons/fonts.gradle"
+
+apply plugin: 'com.google.gms.google-services'
