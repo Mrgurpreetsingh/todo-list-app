@@ -1,39 +1,17 @@
-import React, { useState } from 'react';
+import React, { useContext } from 'react';
 import { View, StyleSheet } from 'react-native';
 import Header from '../components/Header';
 import InputTask from '../components/InputTask';
 import TaskList from '../components/TaskList';
-import { v4 as uuidv4 } from 'uuid';
-
-type Tache = {
-  id: string;
-  titre: string;
-  complete: boolean;
-};
+import { TasksContext } from '../context/tasksContext';
 
 const TachesScreen = () => {
-  const [tasks, setTasks] = useState<Tache[]>([]);
+  const taskCtx = useContext(TasksContext);
 
-  const addTask = (titre: string) => {
-    const nouvelleTache: Tache = {
-      id: uuidv4(),
-      titre,
-      complete: false,
-    };
-    setTasks(prev => [...prev, nouvelleTache]);
-  };
+  // Si le contexte n'est pas encore dispo, on évite une erreur
+  if (!taskCtx) {return null;}
 
-  const deleteTask = (idToRemove: string) => {
-    setTasks(prev => prev.filter(task => task.id !== idToRemove));
-  };
-
-  const toggleComplete = (id: string) => {
-    setTasks(prev =>
-      prev.map(task =>
-        task.id === id ? { ...task, complete: !task.complete } : task
-      )
-    );
-  };
+  const { tasks, addTask, deleteTask, toggleComplete } = taskCtx;
 
   return (
     <View style={styles.container}>
