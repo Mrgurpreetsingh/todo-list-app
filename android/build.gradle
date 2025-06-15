@@ -3,19 +3,33 @@ buildscript {
         buildToolsVersion = "35.0.0"
         minSdkVersion = 24
         compileSdkVersion = 35
-        targetSdkVersion = 35
-        ndkVersion = "27.1.12297006"
-        kotlinVersion = "1.8.21"  // Corrigé la version Kotlin à une stable
+        targetSdkVersion = 34
+        ndkVersion = "27.0.12077973"
+        kotlinVersion = "1.8.20"
     }
     repositories {
         google()
         mavenCentral()
     }
     dependencies {
-        classpath("com.android.tools.build:gradle:8.0.2")  // Version à préciser ici
+        classpath("com.android.tools.build:gradle:8.5.2")
         classpath("com.facebook.react:react-native-gradle-plugin")
         classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion")
-        classpath("com.google.gms:google-services:4.4.2")  // <== Ajout du plugin google-services
+        classpath("com.google.gms:google-services:4.4.2")
+    }
+}
+
+subprojects {
+    afterEvaluate { project ->
+        if (project.hasProperty("android")) {
+            project.android {
+                compileSdkVersion rootProject.ext.compileSdkVersion
+                buildToolsVersion rootProject.ext.buildToolsVersion
+                if (project.hasProperty("ndkVersion")) {
+                    ndkVersion rootProject.ext.ndkVersion // Forcer la version NDK
+                }
+            }
+        }
     }
 }
 

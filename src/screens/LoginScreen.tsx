@@ -1,19 +1,19 @@
 import React, { useContext, useState } from 'react';
 import styled from 'styled-components/native';
+import { Alert } from 'react-native';
 import { AppContext } from '../context/AppContext';
-import { Alert } from 'react-native'; // ✔️ Corrige le message TypeScript + ESLint
 
 const LoginScreen = ({ navigation }: any) => {
   const { login } = useContext(AppContext)!;
-  const [username, setUsername] = useState('');
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
-  const handleLogin = () => {
-    if (username === 'admin' && password === '1234') {
-      login(username,password);
+  const handleLogin = async () => {
+    try {
+      await login(email, password);
       navigation.replace('MainApp');
-    } else {
-      Alert.alert('Erreur', 'Identifiants incorrects'); // 👍 Pas de `alert()` JS ici
+    } catch (error: any) {
+      Alert.alert('Erreur', error.message || 'Identifiants incorrects');
     }
   };
 
@@ -21,9 +21,11 @@ const LoginScreen = ({ navigation }: any) => {
     <Container>
       <Title>Connexion</Title>
       <Input
-        placeholder="Nom d'utilisateur"
-        value={username}
-        onChangeText={setUsername}
+        placeholder="Email"
+        value={email}
+        onChangeText={setEmail}
+        keyboardType="email-address"
+        autoCapitalize="none"
         placeholderTextColor="#999"
       />
       <Input
@@ -36,44 +38,59 @@ const LoginScreen = ({ navigation }: any) => {
       <LoginButton onPress={handleLogin}>
         <ButtonText>Se connecter</ButtonText>
       </LoginButton>
+      <SwitchSignup onPress={() => navigation.navigate('Signup')}>
+        <SwitchText>Pas de compte ? S'inscrire</SwitchText>
+      </SwitchSignup>
     </Container>
   );
 };
 
 export default LoginScreen;
 
-// styled-components
 const Container = styled.View`
   flex: 1;
   justify-content: center;
   align-items: center;
   padding: 20px;
-  background-color: #fff;
+  background-color: #f2f2f2;
 `;
 
 const Title = styled.Text`
-  font-size: 28px;
+  font-size: 26px;
   font-weight: bold;
-  margin-bottom: 30px;
+  margin-bottom: 20px;
+  color: #333;
 `;
 
 const Input = styled.TextInput`
   width: 100%;
   padding: 12px;
-  margin-bottom: 15px;
-  border: 1px solid #ccc;
+  margin-bottom: 16px;
   border-radius: 8px;
+  background-color: white;
+  border: 1px solid #ccc;
   font-size: 16px;
 `;
 
 const LoginButton = styled.TouchableOpacity`
-  background-color: #6200ee;
-  padding: 12px 24px;
+  background-color: #4CAF50;
+  padding: 14px;
   border-radius: 8px;
+  align-items: center;
+  margin-bottom: 10px;
 `;
 
 const ButtonText = styled.Text`
   color: white;
   font-size: 16px;
   font-weight: bold;
+`;
+
+const SwitchSignup = styled.TouchableOpacity`
+  align-items: center;
+`;
+
+const SwitchText = styled.Text`
+  color: #4CAF50;
+  font-size: 14px;
 `;

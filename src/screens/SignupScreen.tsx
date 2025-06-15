@@ -4,18 +4,13 @@ import { Alert } from 'react-native';
 import { AppContext } from '../context/AppContext';
 
 const SignupScreen = ({ navigation }: any) => {
-  const { login } = useContext(AppContext)!;
+  const { signup } = useContext(AppContext)!;
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
   const handleSignup = async () => {
     try {
-      // Ici tu peux appeler ta fonction signup (à créer) ou utiliser Firebase directement
-      // Par exemple, si tu as une fonction signup dans AppContext
-      // await signup(email, password);
-
-      // Pour simplifier, on simule un login direct après inscription :
-      await login(email, password);
+      await signup(email, password);
       navigation.replace('MainApp');
     } catch (error: any) {
       Alert.alert('Erreur', error.message || 'Erreur lors de l\'inscription');
@@ -25,16 +20,18 @@ const SignupScreen = ({ navigation }: any) => {
   return (
     <Container>
       <Title>Inscription</Title>
+      <Label>Email</Label>
       <Input
-        placeholder="Email"
+        placeholder="Votre email"
         value={email}
         onChangeText={setEmail}
         keyboardType="email-address"
         autoCapitalize="none"
         placeholderTextColor="#999"
       />
+      <Label>Mot de passe</Label>
       <Input
-        placeholder="Mot de passe"
+        placeholder="Votre mot de passe"
         value={password}
         onChangeText={setPassword}
         secureTextEntry
@@ -52,36 +49,41 @@ const SignupScreen = ({ navigation }: any) => {
 
 export default SignupScreen;
 
-// styled-components
-const Container = styled.View`
+const Container = styled.ScrollView`
   flex: 1;
-  justify-content: center;
   padding: 20px;
-  background-color: #fff;
+  background-color: #f2f2f2;
 `;
 
 const Title = styled.Text`
-  font-size: 28px;
+  font-size: 26px;
   font-weight: bold;
-  margin-bottom: 30px;
-  text-align: center;
+  margin-bottom: 20px;
+  color: #333;
+`;
+
+const Label = styled.Text`
+  font-size: 16px;
+  margin-bottom: 8px;
+  color: #666;
 `;
 
 const Input = styled.TextInput`
-  width: 100%;
+  background-color: white;
   padding: 12px;
-  margin-bottom: 15px;
-  border: 1px solid #ccc;
   border-radius: 8px;
+  margin-bottom: 16px;
+  border: 1px solid #ccc;
   font-size: 16px;
+  font-family: System; /* Ajout pour éviter les polices personnalisées */
 `;
 
 const SignupButton = styled.TouchableOpacity`
-  background-color: #6200ee;
-  padding: 12px 24px;
+  background-color: #4CAF50;
+  padding: 14px;
   border-radius: 8px;
   align-items: center;
-  margin-bottom: 15px;
+  margin-bottom: 10px;
 `;
 
 const ButtonText = styled.Text`
@@ -95,6 +97,6 @@ const SwitchLogin = styled.TouchableOpacity`
 `;
 
 const SwitchText = styled.Text`
-  color: #6200ee;
+  color: #4CAF50;
   font-size: 14px;
 `;

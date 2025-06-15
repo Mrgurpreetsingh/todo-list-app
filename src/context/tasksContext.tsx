@@ -1,57 +1,41 @@
-import React, { createContext, useState, useEffect, ReactNode } from 'react';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import React, { createContext, useState, ReactNode } from 'react';
 
-export type Tache = {
+type Task = {
   id: string;
-  titre: string;
-  complete: boolean;
+  text: string;
+  completed: boolean;
 };
 
 type TasksContextType = {
-  tasks: Tache[];
-  addTask: (titre: string) => void;
+  tasks: Task[];
+  addTask: (task: Task) => void;
+  toggleTask: (id: string) => void;
   deleteTask: (id: string) => void;
-  toggleComplete: (id: string) => void;
 };
 
 export const TasksContext = createContext<TasksContextType | undefined>(undefined);
 
 export const TasksProvider = ({ children }: { children: ReactNode }) => {
-  const [tasks, setTasks] = useState<Tache[]>([]);
+  const [tasks, setTasks] = useState<Task[]>([]);
 
-  useEffect(() => {
-    const loadTasks = async () => {
-      const stored = await AsyncStorage.getItem('todolist');
-      if (stored) {
-        setTasks(JSON.parse(stored));
-      }
-    };
-    loadTasks();
-  }, []);
-
-  useEffect(() => {
-    AsyncStorage.setItem('todolist', JSON.stringify(tasks));
-  }, [tasks]);
-
-  const addTask = (titre: string) => {
-    const newTask: Tache = { id: Date.now().toString(), titre, complete: false };
-    setTasks(prev => [...prev, newTask]);
+  const addTask = (task: Task) => {
+    setTasks([...tasks, task]);
   };
 
-  const deleteTask = (id: string) => {
-    setTasks(prev => prev.filter(task => task.id !== id));
-  };
-
-  const toggleComplete = (id: string) => {
-    setTasks(prev =>
-      prev.map(task =>
-        task.id === id ? { ...task, complete: !task.complete } : task
+  const toggleTask = (id: string) => {
+    setTasks(
+      tasks.map((task) =>
+        task.id === id ? { ...task, completed: !task.completed } : task
       )
     );
   };
 
+  const deleteTask = (id: string) => {
+    setTasks(tasks.filter((task) => task.id !== id));
+  };
+
   return (
-    <TasksContext.Provider value={{ tasks, addTask, deleteTask, toggleComplete }}>
+    <TasksContext.Provider value={{ tasks, addTask, toggleTask, deleteTask }}>
       {children}
     </TasksContext.Provider>
   );
