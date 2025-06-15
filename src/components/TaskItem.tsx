@@ -1,52 +1,32 @@
-import React, { useContext } from 'react';
+import React from 'react';
 import styled from 'styled-components/native';
-import { TasksContext } from '../context/TasksContext';
-import Icon from 'react-native-vector-icons/MaterialIcons';
+import { Task } from '../context/TasksContext';
 
-type Task = {
-  id: string;
-  text: string;
-  completed: boolean;
-};
+interface TaskItemProps {
+  task: Task;
+}
 
-const TaskContainer = styled.TouchableOpacity`
+const TaskContainer = styled.View`
   flex-direction: row;
+  justify-content: space-between;
   align-items: center;
   background-color: white;
   padding: 12px;
-  border-radius: 8px;
   margin-bottom: 10px;
+  border-radius: 8px;
   border: 1px solid #ccc;
 `;
 
 const TaskText = styled.Text<{ completed: boolean }>`
-  flex: 1;
   font-size: 16px;
   color: #333;
-  text-decoration-line: ${(props) => (props.completed ? 'line-through' : 'none')};
+  text-decoration: ${(props) => (props.completed ? 'line-through' : 'none')};
 `;
 
-const CheckIcon = styled(Icon)`
-  margin-right: 10px;
-`;
-
-const TaskItem: React.FC<{ task: Task }> = ({ task }) => {
-  const { toggleTask, deleteTask } = useContext(TasksContext)!;
-
+const TaskItem: React.FC<TaskItemProps> = ({ task }) => {
   return (
-    <TaskContainer onPress={() => toggleTask(task.id)}>
-      <CheckIcon
-        name={task.completed ? 'check-box' : 'check-box-outline-blank'}
-        size={24}
-        color="#4CAF50"
-      />
-      <TaskText completed={task.completed}>{task.text}</TaskText>
-      <Icon
-        name="delete"
-        size={24}
-        color="#d32f2f"
-        onPress={() => deleteTask(task.id)}
-      />
+    <TaskContainer>
+      <TaskText completed={task.completed}>{task.title}</TaskText>
     </TaskContainer>
   );
 };

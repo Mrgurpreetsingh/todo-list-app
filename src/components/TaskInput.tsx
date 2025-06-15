@@ -1,9 +1,11 @@
-import React, { useState, useContext } from 'react';
+import React, { useState } from 'react';
 import styled from 'styled-components/native';
-import { TasksContext } from '../context/TasksContext';
-import { v4 as uuidv4 } from 'uuid';
 
-const InputContainer = styled.View`
+interface TaskInputProps {
+  onAddTask: (title: string) => void;
+}
+
+const Container = styled.View`
   flex-direction: row;
   margin-bottom: 20px;
 `;
@@ -31,29 +33,28 @@ const ButtonText = styled.Text`
   font-weight: bold;
 `;
 
-const TaskInput: React.FC = () => {
-  const { addTask } = useContext(TasksContext)!;
-  const [taskText, setTaskText] = useState('');
+const TaskInput: React.FC<TaskInputProps> = ({ onAddTask }) => {
+  const [title, setTitle] = useState('');
 
   const handleAddTask = () => {
-    if (taskText.trim()) {
-      addTask({ id: uuidv4(), text: taskText, completed: false });
-      setTaskText('');
+    if (title.trim()) {
+      onAddTask(title);
+      setTitle('');
     }
   };
 
   return (
-    <InputContainer>
+    <Container>
       <Input
-        placeholder="Ajouter une tâche"
-        value={taskText}
-        onChangeText={setTaskText}
+        placeholder="Nouvelle tâche"
+        value={title}
+        onChangeText={setTitle}
         placeholderTextColor="#999"
       />
       <AddButton onPress={handleAddTask}>
         <ButtonText>Ajouter</ButtonText>
       </AddButton>
-    </InputContainer>
+    </Container>
   );
 };
 

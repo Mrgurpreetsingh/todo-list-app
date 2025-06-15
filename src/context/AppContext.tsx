@@ -1,4 +1,4 @@
-import React, { createContext, useState, useEffect, ReactNode } from 'react';
+import React, { createContext, useState, useEffect } from 'react';
 import auth, { FirebaseAuthTypes } from '@react-native-firebase/auth';
 
 type AppContextType = {
@@ -10,35 +10,41 @@ type AppContextType = {
 
 export const AppContext = createContext<AppContextType | undefined>(undefined);
 
-export const AppProvider = ({ children }: { children: ReactNode }) => {
+export const AppProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<FirebaseAuthTypes.User | null>(null);
 
   useEffect(() => {
-    const unsubscribe = auth().onAuthStateChanged(setUser);
+    const unsubscribe = auth().onAuthStateChanged((newUser) => {
+      console.log('Auth state changed, user:', newUser ? newUser.uid : 'none');
+      setUser(newUser);
+    });
     return unsubscribe;
   }, []);
 
   const login = async (email: string, password: string) => {
     try {
-      await auth().signInWithEmailAndPassword(email, password);
-    } catch (error: any) {
-      throw new Error(error.message || 'Échec de la connexion');
+      const userCredential = await auth().signInWithEmailAndPassword(email, password);
+      setUser(userCredential.user);
+    } catch (error) {
+      throw error;
     }
   };
 
   const signup = async (email: string, password: string) => {
     try {
-      await auth().createUserWithEmailAndPassword(email, password);
-    } catch (error: any) {
-      throw new Error(error.message || 'Échec de l\'inscription');
+      const userCredential = await auth().createUserWithEmailAndPassword(email, password);
+      setUser(userCredential.user);
+    } catch (error) {
+      throw error;
     }
   };
 
   const logout = async () => {
     try {
       await auth().signOut();
-    } catch (error: any) {
-      throw new Error(error.message || 'Échec de la déconnexion');
+      setUser(null);
+    } catch (error) {
+      throw error;
     }
   };
 

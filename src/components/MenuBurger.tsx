@@ -5,9 +5,10 @@ import { useNavigation } from '@react-navigation/native';
 import { DrawerNavigationProp } from '@react-navigation/drawer';
 
 type RootDrawerParamList = {
-  Home: undefined;
+  Tabs: undefined;
   Contact: undefined;
 };
+
 type NavigationProp = DrawerNavigationProp<RootDrawerParamList>;
 
 const Button = styled.TouchableOpacity`

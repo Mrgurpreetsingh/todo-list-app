@@ -1,19 +1,21 @@
-import 'react-native-get-random-values';
 import React from 'react';
-import { NavigationContainer } from '@react-navigation/native';
+import { NavigationContainer, createNavigationContainerRef } from '@react-navigation/native';
+import AppNavigator from './navigation/AppNavigator';
 import { AppProvider } from './context/AppContext';
 import { TasksProvider } from './context/TasksContext';
-import AppNavigator from './navigation/AppNavigator';
+
+
+export const navigationRef = createNavigationContainerRef();
 
 const App = () => {
   return (
-    <AppProvider>
-      <TasksProvider>
-        <NavigationContainer>
+    <NavigationContainer ref={navigationRef}>
+      <AppProvider>
+        <TasksProvider>
           <AppNavigator />
-        </NavigationContainer>
-      </TasksProvider>
-    </AppProvider>
+        </TasksProvider>
+      </AppProvider>
+    </NavigationContainer>
   );
 };
 

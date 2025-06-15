@@ -1,16 +1,23 @@
-import React, { useContext } from 'react';
-import { FlatList, Alert } from 'react-native';
+import React from 'react';
+import { useNavigation } from '@react-navigation/native';
 import styled from 'styled-components/native';
-import { TasksContext } from '../context/TasksContext';
-import { AppContext } from '../context/AppContext';
-import TaskInput from '../components/TaskInput';
-import TaskItem from '../components/TaskItem';
-import MenuBurger from '../components/MenuBurger';
+import { StackNavigationProp } from '@react-navigation/stack';
+
+type RootStackParamList = {
+  MainApp: undefined;
+  Login: undefined;
+  Signup: undefined;
+  Tâches: undefined;
+};
+
+type NavigationProp = StackNavigationProp<RootStackParamList>;
 
 const Container = styled.View`
   flex: 1;
   padding: 20px;
   background-color: #f2f2f2;
+  justify-content: center;
+  align-items: center;
 `;
 
 const Title = styled.Text`
@@ -18,13 +25,13 @@ const Title = styled.Text`
   font-weight: bold;
   margin-bottom: 20px;
   color: #333;
+  text-align: center;
 `;
 
-const LogoutButton = styled.TouchableOpacity`
-  background-color: #d32f2f;
-  padding: 14px;
+const Button = styled.TouchableOpacity`
+  background-color: #4CAF50;
+  padding: 14px 40px;
   border-radius: 8px;
-  align-items: center;
   margin-top: 20px;
 `;
 
@@ -35,30 +42,14 @@ const ButtonText = styled.Text`
 `;
 
 const HomeScreen: React.FC = () => {
-  const { tasks } = useContext(TasksContext)!;
-  const { logout } = useContext(AppContext)!;
-
-  const handleLogout = async () => {
-    try {
-      await logout();
-    } catch (error: any) {
-      Alert.alert('Erreur', error.message || 'Échec de la déconnexion');
-    }
-  };
+  const navigation = useNavigation<NavigationProp>();
 
   return (
     <Container>
-      <MenuBurger />
-      <Title>My To-Do List</Title>
-      <TaskInput />
-      <FlatList
-        data={tasks}
-        renderItem={({ item }) => <TaskItem task={item} />}
-        keyExtractor={(item) => item.id}
-      />
-      <LogoutButton onPress={handleLogout}>
-        <ButtonText>Déconnexion</ButtonText>
-      </LogoutButton>
+      <Title>Bienvenue dans votre To-Do List !</Title>
+      <Button onPress={() => navigation.navigate('Tâches')}>
+        <ButtonText>Voir mes tâches</ButtonText>
+      </Button>
     </Container>
   );
 };
