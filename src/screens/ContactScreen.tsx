@@ -96,16 +96,31 @@ const ContactScreen: React.FC = () => {
   const [email, setEmail] = useState('');
   const [message, setMessage] = useState('');
   const [rgpdAccepted, setRgpdAccepted] = useState(false);
+  const [lastSubmitTime, setLastSubmitTime] = useState(0);
 
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
+  const sanitizeInput = (input: string) => {
+    return input.replace(/<[^>]*>/g, ''); // Supprime les balises HTML
+  };
+
   const handleSubmit = async () => {
-    if (!name.trim() || !email.trim() || !message.trim()) {
+    const now = Date.now();
+    if (now - lastSubmitTime < 30000) {
+      Alert.alert('Erreur', 'Veuillez attendre 30 secondes avant de renvoyer un message.');
+      return;
+    }
+
+    const sanitizedName = sanitizeInput(name.trim());
+    const sanitizedEmail = sanitizeInput(email.trim());
+    const sanitizedMessage = sanitizeInput(message.trim());
+
+    if (!sanitizedName || !sanitizedEmail || !sanitizedMessage) {
       Alert.alert('Erreur', 'Veuillez remplir tous les champs.');
       return;
     }
 
-    if (!emailRegex.test(email)) {
+    if (!emailRegex.test(sanitizedEmail)) {
       Alert.alert('Erreur', 'Veuillez entrer un email valide.');
       return;
     }
@@ -116,17 +131,23 @@ const ContactScreen: React.FC = () => {
     }
 
     try {
-      console.log('Envoi du message à Firestore:', { name, email, message, rgpdAccepted });
+      console.log('Envoi du message à Firestore:', {
+        name: sanitizedName,
+        email: sanitizedEmail,
+        message: sanitizedMessage,
+        rgpdAccepted,
+      });
       await firestore()
         .collection('contactMessages')
         .add({
-          name: name.trim(),
-          email: email.trim(),
-          message: message.trim(),
+          name: sanitizedName,
+          email: sanitizedEmail,
+          message: sanitizedMessage,
           rgpdAccepted,
           timestamp: firestore.FieldValue.serverTimestamp(),
         });
       console.log('Message enregistré dans Firestore');
+      setLastSubmitTime(now);
       Alert.alert('Message envoyé', 'Nous vous répondrons bientôt !');
       setName('');
       setEmail('');
@@ -146,7 +167,6 @@ const ContactScreen: React.FC = () => {
     <Container>
       <FormContainer>
         <Title>Contactez-nous</Title>
-
         <Label>Nom</Label>
         <Input
           placeholder="Votre nom"
@@ -154,7 +174,6 @@ const ContactScreen: React.FC = () => {
           onChangeText={setName}
           placeholderTextColor="#999"
         />
-
         <Label>Email</Label>
         <Input
           placeholder="Votre email"
@@ -163,7 +182,6 @@ const ContactScreen: React.FC = () => {
           onChangeText={setEmail}
           placeholderTextColor="#999"
         />
-
         <Label>Message</Label>
         <Input
           placeholder="Votre message"
@@ -174,7 +192,6 @@ const ContactScreen: React.FC = () => {
           onChangeText={setMessage}
           placeholderTextColor="#999"
         />
-
         <CheckboxContainer>
           <Checkbox
             checked={rgpdAccepted}
@@ -186,11 +203,9 @@ const ContactScreen: React.FC = () => {
             J'accepte que mes données soient traitées conformément au RGPD et à la politique de confidentialité.
           </CheckboxLabel>
         </CheckboxContainer>
-
         <Button onPress={handleSubmit}>
           <ButtonText>Envoyer</ButtonText>
         </Button>
-
         <Button onPress={handleOpenMail}>
           <ButtonText>Contacter le support</ButtonText>
         </Button>

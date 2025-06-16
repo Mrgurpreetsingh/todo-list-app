@@ -2,6 +2,7 @@ import React from 'react';
 import { useNavigation } from '@react-navigation/native';
 import styled from 'styled-components/native';
 import { StackNavigationProp } from '@react-navigation/stack';
+import { Pressable } from 'react-native';
 
 type RootStackParamList = {
   MainApp: undefined;
@@ -28,7 +29,7 @@ const Title = styled.Text`
   text-align: center;
 `;
 
-const Button = styled.TouchableOpacity`
+const Button = styled(Pressable)`
   background-color: #4CAF50;
   padding: 14px 40px;
   border-radius: 8px;

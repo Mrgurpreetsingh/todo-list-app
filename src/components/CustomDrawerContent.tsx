@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { memo } from 'react';
 import { DrawerContentScrollView, DrawerItemList, DrawerContentComponentProps } from '@react-navigation/drawer';
 import styled from 'styled-components/native';
 
@@ -13,7 +13,6 @@ const DrawerItem = styled.View`
 `;
 
 const CustomDrawerContent: React.FC<DrawerContentComponentProps> = (props) => {
-  console.log('Drawer routes:', props.state.routes.map((route) => route.name));
   return (
     <DrawerContainer>
       <DrawerContentScrollView {...props}>
@@ -25,4 +24,4 @@ const CustomDrawerContent: React.FC<DrawerContentComponentProps> = (props) => {
   );
 };
 
-export default CustomDrawerContent;
+export default memo(CustomDrawerContent);

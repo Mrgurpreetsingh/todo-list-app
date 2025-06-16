@@ -1,14 +1,13 @@
 import React from 'react';
 import { render, fireEvent, waitFor } from '@testing-library/react-native';
-import LoginScreen from '../src/screens/LoginScreen';
+import SignupScreen from '../src/screens/SignupScreen';
 import { AppContext } from '../src/context/AppContext';
 
 // Mock Firebase Auth
 jest.mock('@react-native-firebase/auth', () => ({
   __esModule: true,
   default: jest.fn(() => ({
-    signInWithEmailAndPassword: jest.fn().mockResolvedValue({ user: { uid: '123' } }),
-    sendPasswordResetEmail: jest.fn().mockResolvedValue(undefined),
+    createUserWithEmailAndPassword: jest.fn().mockResolvedValue({ user: { uid: '123' } }),
   })),
 }));
 
@@ -50,11 +49,11 @@ jest.mock('react-native/Libraries/TurboModule/TurboModuleRegistry', () => ({
   }),
 }));
 
-describe('LoginScreen', () => {
-  const mockLogin = jest.fn().mockResolvedValue(undefined);
+describe('SignupScreen', () => {
+  const mockSignup = jest.fn().mockResolvedValue(undefined);
   const mockContext = {
-    login: mockLogin,
-    signup: jest.fn(),
+    login: jest.fn(),
+    signup: mockSignup,
     logout: jest.fn(),
     user: null,
   };
@@ -62,19 +61,19 @@ describe('LoginScreen', () => {
   it('affiche une erreur si les champs sont vides', async () => {
     const { getByText } = render(
       <AppContext.Provider value={mockContext}>
-        <LoginScreen />
+        <SignupScreen />
       </AppContext.Provider>
     );
-    fireEvent.press(getByText('Se connecter'));
+    fireEvent.press(getByText("S'inscrire"));
     await waitFor(() => {
       expect(require('react-native/Libraries/Alert/Alert').alert).toHaveBeenCalledWith(
         'Erreur',
-        'Échec de la connexion'
+        "Échec de l'inscription"
       );
     });
   });
 
-  it('navigue vers MainApp après connexion réussie', async () => {
+  it('navigue vers MainApp après inscription réussie', async () => {
     const mockNavigate = jest.fn();
     jest.spyOn(require('@react-navigation/native'), 'useNavigation').mockReturnValue({
       navigate: mockNavigate,
@@ -82,14 +81,15 @@ describe('LoginScreen', () => {
 
     const { getByPlaceholderText, getByText } = render(
       <AppContext.Provider value={mockContext}>
-        <LoginScreen />
+        <SignupScreen />
       </AppContext.Provider>
     );
     fireEvent.changeText(getByPlaceholderText('Email'), 'test@example.com');
     fireEvent.changeText(getByPlaceholderText('Mot de passe'), 'password123');
-    fireEvent.press(getByText('Se connecter'));
+    fireEvent.changeText(getByPlaceholderText('Confirmer le mot de passe'), 'password123');
+    fireEvent.press(getByText("S'inscrire"));
     await waitFor(() => {
-      expect(mockLogin).toHaveBeenCalledWith('test@example.com', 'password123');
+      expect(mockSignup).toHaveBeenCalledWith('test@example.com', 'password123');
       expect(mockNavigate).toHaveBeenCalledWith('MainApp');
     });
   });

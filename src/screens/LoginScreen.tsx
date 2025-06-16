@@ -1,10 +1,12 @@
-import React, { useState, useContext } from 'react';
+import React, { useContext, useState } from 'react';
 import styled from 'styled-components/native';
 import { AppContext } from '../context/AppContext';
 import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import auth from '@react-native-firebase/auth';
 import { Alert } from 'react-native';
+import { Formik } from 'formik';
+import * as Yup from 'yup';
 import { Task } from '../context/TasksContext';
 
 type RootStackParamList = {
@@ -35,10 +37,16 @@ const Input = styled.TextInput`
   background-color: white;
   padding: 12px;
   border-radius: 8px;
-  margin-bottom: 16px;
+  margin-bottom: 8px;
   border: 1px solid #ccc;
   color: black;
   font-size: 16px;
+`;
+
+const ErrorText = styled.Text`
+  color: #FF4444;
+  font-size: 12px;
+  margin-bottom: 8px;
 `;
 
 const Button = styled.Pressable`
@@ -61,11 +69,15 @@ const LinkText = styled.Text`
   margin-top: 16px;
 `;
 
+const validationSchema = Yup.object().shape({
+  email: Yup.string().email('Email invalide').required('Email requis'),
+  password: Yup.string().min(6, 'Mot de passe trop court').required('Mot de passe requis'),
+});
+
 const LoginScreen: React.FC = () => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
   const context = useContext(AppContext);
   const navigation = useNavigation<NavigationProp>();
+  const [lastResetTime, setLastResetTime] = useState(0);
 
   if (!context) {
     console.error('AppContext is undefined');
@@ -74,32 +86,21 @@ const LoginScreen: React.FC = () => {
 
   const { login } = context;
 
-  const handleLogin = async () => {
-    try {
-      const trimmedEmail = email.trim();
-      console.log('Tentative de connexion avec email:', trimmedEmail);
-      await login(trimmedEmail, password);
-      console.log('Connexion réussie');
-      navigation.reset({
-        index: 0,
-        routes: [{ name: 'MainApp' }],
-      });
-    } catch (error: any) {
-      console.error('Erreur connexion:', error.code, error.message);
-      Alert.alert('Erreur', error.message || 'Échec de la connexion');
+  const handleResetPassword = async (email: string) => {
+    const now = Date.now();
+    if (now - lastResetTime < 30000) {
+      Alert.alert('Erreur', 'Veuillez attendre 30 secondes avant de réessayer.');
+      return;
     }
-  };
-
-  const handleResetPassword = async () => {
+    if (!email) {
+      Alert.alert('Erreur', 'Veuillez entrer un email');
+      return;
+    }
     try {
-      const trimmedEmail = email.trim();
-      if (!trimmedEmail) {
-        Alert.alert('Erreur', 'Veuillez entrer un email');
-        return;
-      }
-      console.log('Envoi email de réinitialisation pour:', trimmedEmail);
-      await auth().sendPasswordResetEmail(trimmedEmail);
+      console.log('Envoi email de réinitialisation pour:', email);
+      await auth().sendPasswordResetEmail(email.trim());
       console.log('Email de réinitialisation envoyé');
+      setLastResetTime(now);
       Alert.alert('Succès', 'Un email de réinitialisation a été envoyé.');
     } catch (error: any) {
       console.error('Erreur réinitialisation:', error.code, error.message);
@@ -110,30 +111,57 @@ const LoginScreen: React.FC = () => {
   return (
     <Container>
       <Title>Connexion</Title>
-      <Input
-        placeholder="Email"
-        value={email}
-        onChangeText={setEmail}
-        keyboardType="email-address"
-        autoCapitalize="none"
-        placeholderTextColor="#999"
-      />
-      <Input
-        placeholder="Mot de passe"
-        value={password}
-        onChangeText={setPassword}
-        secureTextEntry
-        placeholderTextColor="#999"
-      />
-      <Button onPress={handleLogin}>
-        <ButtonText>Se connecter</ButtonText>
-      </Button>
-      <LinkText onPress={handleResetPassword}>
-        Mot de passe oublié ?
-      </LinkText>
-      <LinkText onPress={() => navigation.navigate('Signup')}>
-        Pas de compte ? Inscrivez-vous
-      </LinkText>
+      <Formik
+        initialValues={{ email: '', password: '' }}
+        validationSchema={validationSchema}
+        onSubmit={async (values, { setSubmitting }) => {
+          try {
+            console.log('Tentative de connexion avec email:', values.email);
+            await login(values.email.trim(), values.password);
+            console.log('Connexion réussie');
+            navigation.reset({
+              index: 0,
+              routes: [{ name: 'MainApp' }],
+            });
+          } catch (error: any) {
+            console.error('Erreur connexion:', error.code, error.message);
+            Alert.alert('Erreur', error.message || 'Échec de la connexion');
+          } finally {
+            setSubmitting(false);
+          }
+        }}
+      >
+        {({ handleChange, handleSubmit, values, errors, touched, isSubmitting }) => (
+          <>
+            <Input
+              placeholder="Email"
+              value={values.email}
+              onChangeText={handleChange('email')}
+              keyboardType="email-address"
+              autoCapitalize="none"
+              placeholderTextColor="#999"
+            />
+            {touched.email && errors.email && <ErrorText>{errors.email}</ErrorText>}
+            <Input
+              placeholder="Mot de passe"
+              value={values.password}
+              onChangeText={handleChange('password')}
+              secureTextEntry
+              placeholderTextColor="#999"
+            />
+            {touched.password && errors.password && <ErrorText>{errors.password}</ErrorText>}
+            <Button onPress={() => handleSubmit()} disabled={isSubmitting}>
+              <ButtonText>Se connecter</ButtonText>
+            </Button>
+            <LinkText onPress={() => handleResetPassword(values.email)}>
+              Mot de passe oublié ?
+            </LinkText>
+            <LinkText onPress={() => navigation.navigate('Signup')}>
+              Pas de compte ? Inscrivez-vous
+            </LinkText>
+          </>
+        )}
+      </Formik>
     </Container>
   );
 };
