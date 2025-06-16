@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Alert, Linking, Dimensions } from 'react-native';
 import styled from 'styled-components/native';
+import firestore from '@react-native-firebase/firestore';
 
 const { width } = Dimensions.get('window');
 const isMobile = width < 600;
@@ -29,14 +30,14 @@ const Title = styled.Text`
   font-size: 26px;
   font-weight: bold;
   margin-bottom: 20px;
-  color: #333;
+  color: #000;
   text-align: center;
 `;
 
 const Label = styled.Text`
   font-size: 16px;
   margin-bottom: 8px;
-  color: #333;
+  color: #000;
 `;
 
 const Input = styled.TextInput`
@@ -45,7 +46,7 @@ const Input = styled.TextInput`
   border-radius: 8px;
   margin-bottom: 16px;
   border: 1px solid #ccc;
-  color: #333;
+  color: #000;
 `;
 
 const CheckboxContainer = styled.View`
@@ -54,7 +55,7 @@ const CheckboxContainer = styled.View`
   margin-bottom: 16px;
 `;
 
-const Checkbox = styled.TouchableOpacity<{ checked: boolean }>`
+const Checkbox = styled.Pressable<{ checked: boolean }>`
   width: 20px;
   height: 20px;
   border: 1px solid #ccc;
@@ -72,11 +73,11 @@ const CheckMark = styled.Text`
 
 const CheckboxLabel = styled.Text`
   font-size: 14px;
-  color: #333;
+  color: #000;
   flex: 1;
 `;
 
-const Button = styled.TouchableOpacity`
+const Button = styled.Pressable`
   background-color: #4CAF50;
   padding: 14px;
   border-radius: 8px;
@@ -98,7 +99,7 @@ const ContactScreen: React.FC = () => {
 
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (!name.trim() || !email.trim() || !message.trim()) {
       Alert.alert('Erreur', 'Veuillez remplir tous les champs.');
       return;
@@ -114,11 +115,27 @@ const ContactScreen: React.FC = () => {
       return;
     }
 
-    Alert.alert('Message envoyé', 'Nous vous répondrons bientôt !');
-    setName('');
-    setEmail('');
-    setMessage('');
-    setRgpdAccepted(false);
+    try {
+      console.log('Envoi du message à Firestore:', { name, email, message, rgpdAccepted });
+      await firestore()
+        .collection('contactMessages')
+        .add({
+          name: name.trim(),
+          email: email.trim(),
+          message: message.trim(),
+          rgpdAccepted,
+          timestamp: firestore.FieldValue.serverTimestamp(),
+        });
+      console.log('Message enregistré dans Firestore');
+      Alert.alert('Message envoyé', 'Nous vous répondrons bientôt !');
+      setName('');
+      setEmail('');
+      setMessage('');
+      setRgpdAccepted(false);
+    } catch (error: any) {
+      console.error('Erreur Firestore:', error.message || error);
+      Alert.alert('Erreur', 'Échec de l\'envoi du message.');
+    }
   };
 
   const handleOpenMail = () => {

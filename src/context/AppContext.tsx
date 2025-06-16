@@ -23,6 +23,7 @@ export const AppProvider = ({ children }: { children: React.ReactNode }) => {
 
   const login = async (email: string, password: string) => {
     try {
+      console.log('Tentative de connexion avec :', email, password);
       const userCredential = await auth().signInWithEmailAndPassword(email, password);
       setUser(userCredential.user);
     } catch (error) {

@@ -1,15 +1,18 @@
 import React, { useState, useContext } from 'react';
-import { Alert } from 'react-native';
 import styled from 'styled-components/native';
 import { AppContext } from '../context/AppContext';
 import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import auth from '@react-native-firebase/auth';
+import { Alert } from 'react-native';
+import { Task } from '../context/TasksContext';
 
 type RootStackParamList = {
   MainApp: undefined;
   Login: undefined;
   Signup: undefined;
+  TaskDetail: { taskId: string; task?: Task };
+  AddTask: { taskId: string; task?: Task };
 };
 
 type NavigationProp = StackNavigationProp<RootStackParamList>;
@@ -38,7 +41,7 @@ const Input = styled.TextInput`
   font-size: 16px;
 `;
 
-const Button = styled.TouchableOpacity`
+const Button = styled.Pressable`
   background-color: #4CAF50;
   padding: 14px;
   border-radius: 8px;
@@ -73,27 +76,33 @@ const LoginScreen: React.FC = () => {
 
   const handleLogin = async () => {
     try {
-      console.log('Tentative de connexion avec email:', email.trim());
-      await login(email.trim(), password);
+      const trimmedEmail = email.trim();
+      console.log('Tentative de connexion avec email:', trimmedEmail);
+      await login(trimmedEmail, password);
       console.log('Connexion réussie');
+      navigation.reset({
+        index: 0,
+        routes: [{ name: 'MainApp' }],
+      });
     } catch (error: any) {
-      console.error('Erreur connexion:', error.message || error);
+      console.error('Erreur connexion:', error.code, error.message);
       Alert.alert('Erreur', error.message || 'Échec de la connexion');
     }
   };
 
   const handleResetPassword = async () => {
     try {
-      if (!email.trim()) {
+      const trimmedEmail = email.trim();
+      if (!trimmedEmail) {
         Alert.alert('Erreur', 'Veuillez entrer un email');
         return;
       }
-      console.log('Envoi email de réinitialisation pour:', email.trim());
-      await auth().sendPasswordResetEmail(email.trim());
+      console.log('Envoi email de réinitialisation pour:', trimmedEmail);
+      await auth().sendPasswordResetEmail(trimmedEmail);
       console.log('Email de réinitialisation envoyé');
       Alert.alert('Succès', 'Un email de réinitialisation a été envoyé.');
     } catch (error: any) {
-      console.error('Erreur réinitialisation:', error.message || error);
+      console.error('Erreur réinitialisation:', error.code, error.message);
       Alert.alert('Erreur', error.message || 'Échec de l\'envoi');
     }
   };
